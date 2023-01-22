@@ -5,6 +5,7 @@ import connection from "./services/db";
 import authRoutes from "./routes/auth";
 import profileRoutes from "./routes/profile";
 import rateLimit, { MemoryStore } from "express-rate-limit";
+import helmet from "helmet";
 require("dotenv").config();
 
 const app: Application = express();
@@ -15,6 +16,11 @@ const limiter = rateLimit({
     max: 5,
     standardHeaders: true,
     store: new MemoryStore(),
+    statusCode: 429,
+    message: {
+        status: "error",
+        message: "too many requests, try again later",
+    },
 });
 
 // database connection
@@ -24,6 +30,8 @@ connection();
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
+app.disable("x-powered-by");
 
 // routes
 app.use("/api/auth", limiter, authRoutes);
