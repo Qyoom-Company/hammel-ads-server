@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt, { Secret } from "jsonwebtoken";
 import UserSchema from "../models/UserSchema";
 import { validationResult } from "express-validator";
 import { ValidationError, ValidationResult } from "../types/validation";
