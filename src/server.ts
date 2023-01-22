@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import connection from "./services/db";
 import authRoutes from "./routes/auth";
+import profileRoutes from "./routes/profile";
 require("dotenv").config();
 
 const app: Application = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/profiles", profileRoutes);
 
 const port: number = Number(process.env.PORT) || 3500;
 
