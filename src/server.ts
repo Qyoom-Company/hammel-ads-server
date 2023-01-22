@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import connection from "./services/db";
 import authRoutes from "./routes/auth";
 import profileRoutes from "./routes/profile";
+import rateLimit, { MemoryStore } from "express-rate-limit";
 require("dotenv").config();
 
 const app: Application = express();

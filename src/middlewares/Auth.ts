@@ -22,12 +22,12 @@ class Auth {
                 });
             }
             const token = req.headers.authorization.split(" ")[1];
-            const { _id, userId } = jwt.verify(
+            const { _id } = jwt.verify(
                 token,
                 process.env.JWT_PRIVATE_KEY as Secret
             ) as JwtPayload;
 
-            const user = await UserSchema.findById(userId || _id);
+            const user = await UserSchema.findById(_id);
             if (!user) return res.send("invalid token");
             req.currentUser = {
                 id: user.id,

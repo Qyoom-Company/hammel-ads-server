@@ -32,10 +32,7 @@ class AuthController {
             });
             user.password = await bcrypt.hash(password, 10);
             await user.save();
-            const token = jwt.sign(
-                { userId: user._id },
-                process.env.JWT_PRIVATE_KEY as Secret
-            );
+            const token = user.generateAuthToken();
             res.status(200).json({ status: "success", token });
         } catch (err: any) {
             if (err?.keyValue) {
