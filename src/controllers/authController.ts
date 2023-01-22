@@ -3,20 +3,21 @@ import bcrypt from "bcrypt";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import UserSchema from "../models/UserSchema";
 import { body, validationResult } from "express-validator";
-interface Result {
-    errors?: Object[];
-    formatter?: Function;
-}
+import { ValidationError, ValidationResult } from "../types/validation";
 
 class AuthController {
     static register = async (req: Request, res: Response) => {
         try {
             const validationResults = validationResult(
                 req
-            ) as unknown as Result;
-            const errors = validationResults?.errors || [];
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
             if (errors.length > 0) {
-                return res.status(400).json(errors);
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
+                });
             }
 
             const { firstName, lastName, email, phoneNumber, password } =
@@ -53,31 +54,23 @@ class AuthController {
     };
     static login = async (req: Request, res: Response) => {
         try {
+            const validationResults = validationResult(
+                req
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
+                });
+            }
+
             const { email, password } = req.body;
             const data = {
                 email,
                 password,
             };
-
-            let missingFields = Object.keys(data).filter(
-                // @ts-ignore
-                (key) => data[key] === undefined
-            );
-            if (missingFields.length > 0) {
-                if (missingFields.length === 1) {
-                    return res.status(400).json({
-                        status: "error",
-                        message: `${missingFields[0]} field is required`,
-                    });
-                } else {
-                    return res.status(400).json({
-                        status: "error",
-                        message: `${missingFields.join(
-                            " and "
-                        )} fields are required`,
-                    });
-                }
-            }
             const user = await UserSchema.findOne({ email });
             if (!user) {
                 return res.status(404).json({
@@ -93,10 +86,7 @@ class AuthController {
                     message: "Invalid password",
                 });
             }
-            const token = jwt.sign(
-                { userId: user._id },
-                process.env.JWT_PRIVATE_KEY as Secret
-            );
+            const token = user.generateAuthToken();
             res.status(200).json({ status: "success", token });
         } catch (err: any) {
             res.status(500).json({

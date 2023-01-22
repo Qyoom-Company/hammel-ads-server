@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
-
+import * as mongoose from "mongoose";
+import jwt, { Secret } from "jsonwebtoken";
+import IUser from "../types/user";
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -9,9 +9,14 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
 });
 
-// userSchema.methods.generateAuthToken = () => {
-//     // @ts-ignore
-//     const token = jwt.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY);
-// };
+userSchema.methods.generateAuthToken = function (): string {
+    const token = jwt.sign(
+        { _id: this._id },
+        process.env.JWT_PRIVATE_KEY as Secret
+    );
+    return token;
+};
 
-export default mongoose.model("User", userSchema);
+const User = mongoose.model<IUser & mongoose.Document>("User", userSchema);
+
+export default User;

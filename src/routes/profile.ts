@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { ServerResponse } from "http";
 import authMiddleware from "../middlewares/Auth";
 
 const router = express.Router();
