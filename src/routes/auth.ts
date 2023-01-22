@@ -9,8 +9,6 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
     try {
         const { firstName, lastName, email, phoneNumber, password } = req.body;
-        console.log(req.body);
-        console.log(firstName, lastName, email, phoneNumber, password);
         const data = {
             firstName,
             lastName,
@@ -69,7 +67,6 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password);
         const data = {
             email,
             password,
