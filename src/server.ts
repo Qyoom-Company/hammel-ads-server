@@ -9,6 +9,14 @@ require("dotenv").config();
 
 const app: Application = express();
 
+// rate limiter
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    store: new MemoryStore(),
+});
+
 // database connection
 connection();
 
@@ -18,7 +26,7 @@ app.use(express.json());
 app.use(cors());
 
 // routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", limiter, authRoutes);
 app.use("/api/profiles", profileRoutes);
 
 // port
