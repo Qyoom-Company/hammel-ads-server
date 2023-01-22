@@ -16,11 +16,14 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
 
+// routes
 app.use("/api/auth", authRoutes);
 app.use("/api/profiles", profileRoutes);
 
+// port
 const port: number = Number(process.env.PORT) || 3500;
 
+// start server
 app.listen(port, () => {
     console.log(`server started on port ${port}...`);
 });

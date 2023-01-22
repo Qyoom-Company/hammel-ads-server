@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import UserSchema from "../models/UserSchema";
-import { body, validationResult } from "express-validator";
+import { validationResult } from "express-validator";
 import { ValidationError, ValidationResult } from "../types/validation";
 
 class AuthController {
