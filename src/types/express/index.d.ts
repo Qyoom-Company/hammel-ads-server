@@ -1,12 +1,12 @@
 declare namespace Express {
     interface Request {
         currentUser?: {
-            id?: String;
-            firstName?: String;
-            lastName?: String;
-            email?: String;
-            phoneNumber?: String;
-            password?: string;
+            _id: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            phoneNumber: string;
+            isEmailConfirmed: Boolean;
         };
     }
 }

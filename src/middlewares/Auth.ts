@@ -30,11 +30,12 @@ class Auth {
             const user = await UserSchema.findById(_id);
             if (!user) return res.send("invalid token");
             req.currentUser = {
-                id: user.id,
+                _id: user._id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
+                isEmailConfirmed: user.isEmailConfirmed,
             };
 
             next();

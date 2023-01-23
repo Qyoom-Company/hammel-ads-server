@@ -1,10 +1,12 @@
 interface IUser {
-    id: String;
-    firstName: String;
-    lastName: String;
-    email: String;
-    phoneNumber: String;
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
     password: string;
+    isEmailConfirmed: Boolean;
+    confirmationToken: string | null;
     generateAuthToken: () => String;
 }
 

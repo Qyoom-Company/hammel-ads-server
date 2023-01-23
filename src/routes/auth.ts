@@ -21,4 +21,12 @@ router.post(
     AuthController.login
 );
 
+router.get("/confirm/:token", AuthController.confirmEmail);
+
+router.post(
+    "/forgotPassword",
+    body("email").isEmail(),
+    AuthController.forgotPassword
+);
+
 export default router;
