@@ -18,6 +18,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    resetToken: {
+        type: String,
+        default: null,
+    },
+    resetTokenExpiration: {
+        type: Date,
+        default: null,
+    },
 });
 
 const generateConfirmationToken = () => {
@@ -33,7 +41,7 @@ userSchema.methods.generateAuthToken = function (): string {
 };
 
 userSchema.pre("save", function (next) {
-    if (!this.isModified("confirmationToken")) {
+    if (this.isModified("email")) {
         this.confirmationToken = generateConfirmationToken();
         sendConfirmationEmail(this.confirmationToken, this.email);
     }

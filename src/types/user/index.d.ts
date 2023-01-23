@@ -7,6 +7,8 @@ interface IUser {
     password: string;
     isEmailConfirmed: Boolean;
     confirmationToken: string | null;
+    resetToken: string | null;
+    resetTokenExpiration: Date | null;
     generateAuthToken: () => String;
 }
 

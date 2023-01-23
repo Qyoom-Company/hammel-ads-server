@@ -4,7 +4,8 @@ import UserSchema from "../models/UserSchema";
 import { validationResult } from "express-validator";
 import { ValidationError, ValidationResult } from "../types/validation";
 import { sendPasswordResetEmail } from "../services/email";
-
+import crypto from "crypto";
+import User from "../models/UserSchema";
 class AuthController {
     static register = async (req: Request, res: Response) => {
         try {
@@ -119,7 +120,7 @@ class AuthController {
         }
     };
 
-    static forgotPassword = async (req: Request, res: Response) => {
+    static resetPassword = async (req: Request, res: Response) => {
         try {
             const validationResults = validationResult(
                 req
@@ -139,14 +140,67 @@ class AuthController {
                     status: "error",
                     message: "no user found with that email address",
                 });
+            } else {
+                // create a random token
+                const resetToken = crypto.randomBytes(20).toString("hex");
+                user.resetToken = resetToken;
+                user.resetTokenExpiration = new Date(Date.now() + 3600000);
+                await user.save();
+                // Send email to user with the reset link
+                await sendPasswordResetEmail(resetToken, user.email);
+                res.status(200).json({
+                    status: "success",
+                    message: "email sent.",
+                });
+            }
+        } catch (err: any) {
+            res.status(500).json({
+                status: "error",
+                message: "internal server error",
+            });
+        }
+    };
+
+    static newPassword = async (req: Request, res: Response) => {
+        try {
+            const validationResults = validationResult(
+                req
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
+                });
             }
 
-            // await sendPasswordResetEmail()
+            const { resetToken, newPassword } = req.body;
 
-            res.status(200).json({
-                status: "success",
-                message: "email sent.",
+            const user = await User.findOne({
+                resetToken: resetToken,
+                resetTokenExpiration: { $gt: Date.now() },
             });
+
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ status: "error", message: "Invalid Token" });
+            }
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedPassword;
+            user.resetToken = null;
+            user.resetTokenExpiration = null;
+            const token = user.generateAuthToken();
+            await user.save();
+            return res
+                .status(200)
+                .json({
+                    status: "success",
+                    message: "password updated",
+                    token,
+                });
         } catch (err: any) {
             res.status(500).json({
                 status: "error",

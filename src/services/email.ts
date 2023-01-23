@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 let transporter = nodemailer.createTransport({
-    service: "gmail", // no need to set host or port etc.
+    service: "gmail",
     auth: {
         user: "mellitifiras.freelance@gmail.com",
         pass: "518364518364",
@@ -28,14 +28,17 @@ export async function sendConfirmationEmail(token: string, email: string) {
     }
 }
 
-export async function sendPasswordResetEmail(token: string, email: string) {
+export async function sendPasswordResetEmail(
+    resetToken: string,
+    email: string
+) {
     try {
         const mailOptions = {
             from: "mellitifiras@protonmail.com",
             to: email,
             subject: "Email Confirmation - hammel ads",
             text: `link to reset pass
-               ${process.env.DOMAIN}/api/auth/confirm/${token}\n\n
+               ${process.env.DOMAIN}/api/auth/reset/${resetToken}\n\n
                If you did not request this, please ignore this email and your password will remain unchanged.\n`,
         };
 

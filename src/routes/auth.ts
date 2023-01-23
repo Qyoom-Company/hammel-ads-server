@@ -23,10 +23,13 @@ router.post(
 
 router.get("/confirm/:token", AuthController.confirmEmail);
 
+router.post("/reset", body("email").isEmail(), AuthController.resetPassword);
+
 router.post(
-    "/forgotPassword",
-    body("email").isEmail(),
-    AuthController.forgotPassword
+    "/newPassword",
+    body("resetToken").notEmpty(),
+    body("newPassword").isStrongPassword({ minLength: 8 }),
+    AuthController.newPassword
 );
 
 export default router;
