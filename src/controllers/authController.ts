@@ -194,13 +194,11 @@ class AuthController {
             user.resetTokenExpiration = null;
             const token = user.generateAuthToken();
             await user.save();
-            return res
-                .status(200)
-                .json({
-                    status: "success",
-                    message: "password updated",
-                    token,
-                });
+            return res.status(200).json({
+                status: "success",
+                message: "password updated",
+                token,
+            });
         } catch (err: any) {
             res.status(500).json({
                 status: "error",
