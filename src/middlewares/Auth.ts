@@ -12,13 +12,13 @@ class Auth {
             if (!req?.headers?.authorization) {
                 return res.status(401).json({
                     status: "error",
-                    message: "not authenticated",
+                    message: "not authorized",
                 });
             }
             if (req.headers.authorization.split(" ").length <= 1) {
                 return res.status(401).json({
                     status: "error",
-                    message: "not authenticated",
+                    message: "not authorized",
                 });
             }
             const token = req.headers.authorization.split(" ")[1];
@@ -28,7 +28,11 @@ class Auth {
             ) as JwtPayload;
 
             const user = await UserSchema.findById(_id);
-            if (!user) return res.send("invalid token");
+            if (!user)
+                return res.status(401).json({
+                    status: "error",
+                    message: "not authorized",
+                });
             req.currentUser = {
                 _id: user._id,
                 firstName: user.firstName,

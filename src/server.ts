@@ -13,7 +13,7 @@ const app: Application = express();
 // rate limiter
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: process.env.ENV === "DEV" ? 1500 : 5,
+    max: process.env.ENV === "DEV" ? 1555 : 5,
     standardHeaders: true,
     store: new MemoryStore(),
     statusCode: 429,

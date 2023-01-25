@@ -34,7 +34,19 @@ class AuthController {
             user.password = await bcrypt.hash(password, 10);
             await user.save();
             const token = user.generateAuthToken();
-            res.status(200).json({ status: "success", token });
+            res.status(200).json({
+                status: "success",
+                data: {
+                    user: {
+                        _id: user._id,
+                        firstName,
+                        lastName,
+                        email,
+                        phoneNumber,
+                    },
+                    token,
+                },
+            });
         } catch (err: any) {
             if (err?.keyValue) {
                 return res.status(400).json({
@@ -85,7 +97,19 @@ class AuthController {
                 });
             }
             const token = user.generateAuthToken();
-            res.status(200).json({ status: "success", token });
+            res.status(200).json({
+                status: "success",
+                data: {
+                    user: {
+                        _id: user._id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        phoneNumber: user.phoneNumber,
+                    },
+                    token,
+                },
+            });
         } catch (err: any) {
             res.status(500).json({
                 status: "error",
