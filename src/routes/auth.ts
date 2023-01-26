@@ -14,12 +14,7 @@ router.post(
     AuthController.register
 );
 
-router.post(
-    "/login",
-    body("email").isEmail(),
-    body("password").isStrongPassword({ minLength: 8 }),
-    AuthController.login
-);
+router.post("/login", AuthController.login);
 
 router.get("/confirm/:token", AuthController.confirmEmail);
 
@@ -30,6 +25,12 @@ router.post(
     body("resetToken").notEmpty(),
     body("newPassword").isStrongPassword({ minLength: 8 }),
     AuthController.newPassword
+);
+
+router.post(
+    "/verifyToken",
+    body("resetToken").notEmpty(),
+    AuthController.verifyToken
 );
 
 export default router;

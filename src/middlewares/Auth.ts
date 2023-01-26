@@ -43,8 +43,14 @@ class Auth {
             };
 
             next();
-        } catch (err) {
-            console.log(err);
+        } catch (err: any) {
+            console.log(JSON.stringify(err));
+            if (err?.message?.includes("invalid signature")) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "invalid token",
+                });
+            }
             res.status(500).json({
                 status: "error",
                 message: "internal server error",

@@ -3,7 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import connection from "./services/db";
 import authRoutes from "./routes/auth";
-import profileRoutes from "./routes/profile";
+import userRoutes from "./routes/user";
 import rateLimit, { MemoryStore } from "express-rate-limit";
 import helmet from "helmet";
 require("dotenv").config();
@@ -35,7 +35,7 @@ app.disable("x-powered-by");
 
 // routes
 app.use("/api/auth", limiter, authRoutes);
-app.use("/api/profiles", profileRoutes);
+app.use("/api/users", userRoutes);
 
 // port
 const port: number = Number(process.env.PORT) || 3500;

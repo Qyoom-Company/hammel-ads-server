@@ -37,13 +37,6 @@ class AuthController {
             res.status(200).json({
                 status: "success",
                 data: {
-                    user: {
-                        _id: user._id,
-                        firstName,
-                        lastName,
-                        email,
-                        phoneNumber,
-                    },
                     token,
                 },
             });
@@ -77,10 +70,6 @@ class AuthController {
             }
 
             const { email, password } = req.body;
-            const data = {
-                email,
-                password,
-            };
             const user = await UserSchema.findOne({ email });
             if (!user) {
                 return res.status(404).json({
@@ -100,13 +89,6 @@ class AuthController {
             res.status(200).json({
                 status: "success",
                 data: {
-                    user: {
-                        _id: user._id,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        email: user.email,
-                        phoneNumber: user.phoneNumber,
-                    },
                     token,
                 },
             });
@@ -131,9 +113,14 @@ class AuthController {
                 user.confirmationToken = null;
 
                 await user.save();
+
+                const token = user.generateAuthToken();
                 res.status(200).json({
                     status: "success",
                     message: "email has been verified successfully",
+                    data: {
+                        token,
+                    },
                 });
             }
         } catch (err: any) {
@@ -146,17 +133,6 @@ class AuthController {
 
     static resetPassword = async (req: Request, res: Response) => {
         try {
-            const validationResults = validationResult(
-                req
-            ) as unknown as ValidationResult;
-            const errors: ValidationError[] =
-                (validationResults?.errors as ValidationError[]) || [];
-            if (errors.length > 0) {
-                return res.status(400).json({
-                    status: "error",
-                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
-                });
-            }
             const { email } = req.body;
             const user = await UserSchema.findOne({ email: email });
             if (!user) {
@@ -221,7 +197,47 @@ class AuthController {
             return res.status(200).json({
                 status: "success",
                 message: "password updated",
-                token,
+                data: {
+                    token,
+                },
+            });
+        } catch (err: any) {
+            res.status(500).json({
+                status: "error",
+                message: "internal server error",
+            });
+        }
+    };
+    static verifyToken = async (req: Request, res: Response) => {
+        try {
+            const validationResults = validationResult(
+                req
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid token`,
+                });
+            }
+
+            const { resetToken } = req.body;
+
+            const user = await User.findOne({
+                resetToken: resetToken,
+                resetTokenExpiration: { $gt: Date.now() },
+            });
+
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ status: "error", message: "Invalid Token" });
+            }
+
+            return res.status(200).json({
+                status: "success",
+                message: "token is valid",
             });
         } catch (err: any) {
             res.status(500).json({
