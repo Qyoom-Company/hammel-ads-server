@@ -44,7 +44,6 @@ class Auth {
 
             next();
         } catch (err: any) {
-            console.log(JSON.stringify(err));
             if (err?.message?.includes("invalid signature")) {
                 return res.status(400).json({
                     status: "error",
