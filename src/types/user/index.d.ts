@@ -10,7 +10,8 @@ interface IUser {
     confirmationToken: string | null;
     resetToken: string | null;
     resetTokenExpiration: Date | null;
-    generateAuthToken: () => String;
+    generateAuthToken: () => string;
+    generateConfirmationToken: () => string;
 }
 
 export default IUser;

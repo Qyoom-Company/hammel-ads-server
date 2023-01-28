@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 import UserSchema from "../models/UserSchema";
 import { validationResult } from "express-validator";
 import { ValidationError, ValidationResult } from "../types/validation";
-import { sendPasswordResetEmail } from "../services/email";
+import {
+    sendConfirmationEmail,
+    sendPasswordResetEmail,
+} from "../services/email";
 import crypto from "crypto";
 import path from "path";
 import User from "../models/UserSchema";
@@ -52,23 +55,38 @@ class UserController {
 
             const userData = req.body;
 
-            const isMatch = await bcrypt.compare(
-                userData.currentPassword,
-                req.currentUser?.password || ""
-            );
+            // const isMatch = await bcrypt.compare(
+            //     userData.currentPassword,
+            //     req.currentUser?.password || ""
+            // );
 
-            if (!isMatch) {
-                return res.status(401).json({
-                    status: "error",
-                    message: "incorrect currentPassword",
-                });
+            // if (!isMatch) {
+            //     return res.status(401).json({
+            //         status: "error",
+            //         message: "incorrect currentPassword",
+            //     });
+            // }
+
+            // userData.password = await bcrypt.hash(userData.password, 10);
+
+            // const user = await User.findByIdAndUpdate(req.currentUser?._id, {
+            //     ...userData,
+            //     // currentPassword: null,
+            // });
+            if (userData.email !== req.currentUser?.email) {
+                userData.isEmailConfirmed = false;
+
+                const newConfirmationToken = crypto
+                    .randomBytes(20)
+                    .toString("hex");
+
+                userData.confirmationToken = newConfirmationToken;
+                sendConfirmationEmail(newConfirmationToken, userData.email);
             }
-
-            userData.password = await bcrypt.hash(userData.password, 10);
 
             const user = await User.findByIdAndUpdate(req.currentUser?._id, {
                 ...userData,
-                currentPassword: null,
+                // currentPassword: null,
             });
 
             res.status(200).json({
@@ -87,7 +105,9 @@ class UserController {
             if (err?.keyValue) {
                 return res.status(400).json({
                     status: "error",
-                    message: `${Object.keys(err.keyValue)[0]} already in use`,
+                    message: `${
+                        Object.keys(err.keyValue)[0]
+                    } already in use by another user`,
                 });
             }
             console.log(err);
@@ -109,7 +129,6 @@ class UserController {
                     .json({ status: "error", message: "no file selected!" });
             }
             const extention = path.parse(file.name).ext;
-            console.log(file, file.mimetype);
             if (!file.mimetype.startsWith("image")) {
                 res.status(400).json({
                     status: "error",
@@ -117,12 +136,34 @@ class UserController {
                 });
             }
             const filename = await this.saveFile(file);
+            await User.findByIdAndUpdate(req.currentUser?._id, {
+                photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
+            });
             res.status(200).json({
                 status: "success",
                 message: "photo uploaded",
                 data: {
                     photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
                 },
+            });
+        } catch (err: any) {
+            console.log(err);
+
+            res.status(500).json({
+                status: "error",
+                message: "internal server error",
+            });
+        }
+    };
+    static removeProfilePhoto = async (req: Request, res: Response) => {
+        try {
+            await User.findByIdAndUpdate(req.currentUser?._id, {
+                photoPath: null,
+            });
+
+            res.status(200).json({
+                status: "success",
+                message: "profile photo removed",
             });
         } catch (err: any) {
             console.log(err);
