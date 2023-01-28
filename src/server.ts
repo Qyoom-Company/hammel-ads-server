@@ -36,6 +36,7 @@ app.disable("x-powered-by");
 // routes
 app.use("/api/auth", limiter, authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/uploads", express.static("uploads"));
 
 // port
 const port: number = Number(process.env.PORT) || 3500;

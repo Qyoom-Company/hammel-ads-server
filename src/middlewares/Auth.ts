@@ -40,16 +40,21 @@ class Auth {
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 isEmailConfirmed: user.isEmailConfirmed,
+                password: user.password,
             };
 
             next();
         } catch (err: any) {
-            if (err?.message?.includes("invalid signature")) {
+            if (
+                err?.message?.includes("invalid signature") ||
+                err?.message?.includes("jwt malformed")
+            ) {
                 return res.status(400).json({
                     status: "error",
                     message: "invalid token",
                 });
             }
+            console.log(err);
             res.status(500).json({
                 status: "error",
                 message: "internal server error",

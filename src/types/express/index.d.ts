@@ -7,6 +7,7 @@ declare namespace Express {
             email: string;
             phoneNumber: string;
             isEmailConfirmed: Boolean;
+            password: string;
         };
     }
 }
