@@ -5,6 +5,7 @@ interface IUser {
     email: string;
     phoneNumber: string;
     password: string;
+    photoPath: string | null;
     isEmailConfirmed: Boolean;
     confirmationToken: string | null;
     resetToken: string | null;

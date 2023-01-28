@@ -41,6 +41,7 @@ class Auth {
                 phoneNumber: user.phoneNumber,
                 isEmailConfirmed: user.isEmailConfirmed,
                 password: user.password,
+                photoPath: user.photoPath,
             };
 
             next();

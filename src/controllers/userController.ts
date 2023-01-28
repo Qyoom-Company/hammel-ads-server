@@ -27,6 +27,7 @@ class UserController {
                             lastName: req.currentUser?.lastName,
                             email: req.currentUser?.email,
                             phoneNumber: req.currentUser?.phoneNumber,
+                            photoPath: req.currentUser?.photoPath,
                         },
                     },
                 });
