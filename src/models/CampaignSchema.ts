@@ -45,6 +45,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    clicks: {
+        type: Number,
+        default: 0,
+    },
+    clickRate: {
+        type: Number,
+        default: null,
+    },
+    views: {
+        type: Number,
+        default: 0,
+    },
+    moneySpent: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const Campaign = mongoose.model<IUser & mongoose.Document>(

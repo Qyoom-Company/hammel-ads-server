@@ -14,6 +14,11 @@ export default interface IUser {
     resetTokenExpiration: Date | null;
     userType: UserType;
     userId: string;
+    createdAt: Date;
+    clicks: number;
+    clickRate: number | null;
+    views: number;
+
     generateAuthToken: () => string;
     generateConfirmationToken: () => string;
 }

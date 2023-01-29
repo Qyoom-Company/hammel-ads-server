@@ -155,7 +155,6 @@ class CampaignController {
             }
 
             const campaign = await CampaignSchema.findById(id);
-            console.log(campaign);
             if (!campaign) {
                 return res.status(404).json({
                     status: "error",

@@ -14,7 +14,7 @@ const router = express.Router();
 router.post(
     "/",
     authMiddleware.validate,
-    body("title").isLength({ min: 3, max: 100 }),
+    body("title").isLength({ min: 3, max: 30 }),
     body("startDate").isDate({ format: "DD/MM/YYYY" }),
     body("endDate").isDate({ format: "DD/MM/YYYY" }),
     body("budget").isNumeric(),
@@ -29,7 +29,7 @@ router.get("/", authMiddleware.validate, CampaignController.getAllCampaigns);
 router.get("/:id", authMiddleware.validate, CampaignController.getOneCampaign);
 router.patch(
     "/:id",
-    body("title").isLength({ min: 3, max: 100 }),
+    body("title").isLength({ min: 3, max: 30 }),
     body("startDate").isDate({ format: "DD/MM/YYYY" }),
     body("endDate").isDate({ format: "DD/MM/YYYY" }),
     body("budget").isNumeric(),
