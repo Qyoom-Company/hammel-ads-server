@@ -9,6 +9,7 @@ declare namespace Express {
             isEmailConfirmed: Boolean;
             password: string;
             photoPath: string | null;
+            isAdmin: Boolean;
         };
     }
 }

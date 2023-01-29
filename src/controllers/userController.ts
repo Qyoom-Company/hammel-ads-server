@@ -1,12 +1,6 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import UserSchema from "../models/UserSchema";
 import { validationResult } from "express-validator";
 import { ValidationError, ValidationResult } from "../types/validation";
-import {
-    sendConfirmationEmail,
-    sendPasswordResetEmail,
-} from "../services/email";
 import crypto from "crypto";
 import path from "path";
 import User from "../models/UserSchema";
@@ -182,8 +176,8 @@ class UserController {
     private static generateRandomName(length: number) {
         return crypto
             .randomBytes(Math.ceil(length / 2))
-            .toString("hex") // convert to hexadecimal format
-            .slice(0, length); // return required number of characters
+            .toString("hex")
+            .slice(0, length);
     }
 }
 

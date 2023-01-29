@@ -147,7 +147,7 @@ class AuthController {
                 user.resetTokenExpiration = new Date(Date.now() + 3600000);
                 await user.save();
                 // Send email to user with the reset link
-                await sendPasswordResetEmail(resetToken, user.email);
+                await sendPasswordResetEmail(resetToken, user?.email);
                 res.status(200).json({
                     status: "success",
                     message: "email sent.",
@@ -188,6 +188,19 @@ class AuthController {
                     .json({ status: "error", message: "Invalid Token" });
             }
 
+            const sameAsPrevious = await bcrypt.compare(
+                newPassword,
+                user.password
+            );
+
+            if (sameAsPrevious) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `cannot use previous password`,
+                });
+            }
+
+            console.log(sameAsPrevious);
             const hashedPassword = await bcrypt.hash(newPassword, 10);
             user.password = hashedPassword;
             user.resetToken = null;

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import UserSchema from "../models/UserSchema";
 import jwt, { Secret, JwtPayload } from "jsonwebtoken";
+import { UserType } from "../types/user/UserType";
 
 class Auth {
     static validate = async (
@@ -37,11 +38,12 @@ class Auth {
                 _id: user._id,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                email: user.email,
+                email: user?.email,
                 phoneNumber: user.phoneNumber,
                 isEmailConfirmed: user.isEmailConfirmed,
                 password: user.password,
                 photoPath: user.photoPath,
+                isAdmin: user.userType === UserType.Admin,
             };
 
             next();

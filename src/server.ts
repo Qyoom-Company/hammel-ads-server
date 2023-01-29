@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import connection from "./services/db";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
+import campaignRoutes from "./routes/campaigns";
 import rateLimit, { MemoryStore } from "express-rate-limit";
 import helmet from "helmet";
 require("dotenv").config();
@@ -36,6 +37,7 @@ app.disable("x-powered-by");
 // routes
 app.use("/api/auth", limiter, authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/campaigns", campaignRoutes);
 app.use("/uploads", express.static("uploads"));
 
 // port

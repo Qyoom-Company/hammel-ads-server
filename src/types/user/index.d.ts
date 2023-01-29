@@ -1,4 +1,6 @@
-interface IUser {
+import mongoose from "mongoose";
+import { UserType } from "./UserType";
+export default interface IUser {
     _id: string;
     firstName: string;
     lastName: string;
@@ -10,8 +12,8 @@ interface IUser {
     confirmationToken: string | null;
     resetToken: string | null;
     resetTokenExpiration: Date | null;
+    userType: UserType;
+    userId: string;
     generateAuthToken: () => string;
     generateConfirmationToken: () => string;
 }
-
-export default IUser;
