@@ -13,7 +13,6 @@ import User from "../models/UserSchema";
 class UserController {
     static getUserInfo = async (req: Request, res: Response) => {
         try {
-            console.log("hello");
             if (req.currentUser?.isEmailConfirmed === false) {
                 return res.status(401).json({
                     status: "error",
@@ -73,20 +72,11 @@ class UserController {
             //     ...userData,
             //     // currentPassword: null,
             // });
-            if (userData.email !== req.currentUser?.email) {
-                userData.isEmailConfirmed = false;
-
-                const newConfirmationToken = crypto
-                    .randomBytes(20)
-                    .toString("hex");
-
-                userData.confirmationToken = newConfirmationToken;
-                sendConfirmationEmail(newConfirmationToken, userData.email);
-            }
 
             const user = await User.findByIdAndUpdate(req.currentUser?._id, {
-                ...userData,
-                // currentPassword: null,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                phoneNumber: userData.phoneNumber,
             });
 
             res.status(200).json({

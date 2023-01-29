@@ -15,7 +15,7 @@ router.patch(
     authMiddleware.validate,
     body("firstName").isLength({ min: 3, max: 20 }),
     body("lastName").isLength({ min: 3, max: 20 }),
-    body("email").isEmail(),
+    // body("email").isEmail(),
     // body("currentPassword").notEmpty(),
     // body("password").isStrongPassword({ minLength: 8 }),
     body("phoneNumber").isMobilePhone(["ar-SA", "en-US", "ar-TN"]),
