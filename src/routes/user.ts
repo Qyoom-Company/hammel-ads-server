@@ -7,7 +7,6 @@ import fileUpload from "express-fileupload";
 const router = express.Router();
 
 // const upload = multer({ dest: "uploads/" });
-router.use(fileUpload({ createParentPath: false }));
 
 router.get("/getuser", authMiddleware.validate, userController.getUserInfo);
 router.patch(
@@ -23,12 +22,13 @@ router.patch(
 );
 
 router.post(
-    "/upload-photo",
+    "/upload-profile-photo",
+    fileUpload({ createParentPath: false }),
     authMiddleware.validate,
     userController.uploadProfilePhoto
 );
 router.delete(
-    "/remove-photo",
+    "/remove-profile-photo",
     authMiddleware.validate,
     userController.removeProfilePhoto
 );

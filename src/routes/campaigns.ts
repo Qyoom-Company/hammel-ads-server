@@ -6,22 +6,27 @@ import authMiddleware from "../middlewares/Auth";
 import fileUpload from "express-fileupload";
 import CampaignController from "../controllers/campaignController";
 import { CampaignStatus } from "../types/campaign/CampaignStatus";
+import countryList from "../static/countryList";
 const router = express.Router();
 
 // // const upload = multer({ dest: "uploads/" });
-// router.use(fileUpload({ createParentPath: false }));
 
 router.post(
     "/",
+    (req, res, next) => {
+        console.log("helloooooooo", req);
+        console.error("boooooooodyyy", req.body);
+        next();
+    },
     authMiddleware.validate,
     body("title").isLength({ min: 3, max: 30 }),
-    body("startDate").isDate({ format: "DD/MM/YYYY" }),
-    body("endDate").isDate({ format: "DD/MM/YYYY" }),
+    body("startDate").isDate({ format: "MM/DD/YYYY" }),
+    body("endDate").isDate({ format: "MM/DD/YYYY" }),
     body("budget").isNumeric(),
-    body("country").notEmpty(),
+    body("country").isIn(countryList),
     body("photoPath").notEmpty(),
     body("link").notEmpty(),
-    body("status").equals(CampaignStatus.DRAFT || CampaignStatus.INREVIEW),
+    body("status").isIn([CampaignStatus.DRAFT, CampaignStatus.INREVIEW]),
     CampaignController.addCampaign
 );
 
@@ -39,6 +44,13 @@ router.patch(
     body("status").isIn(Object.values(CampaignStatus)),
     authMiddleware.validate,
     CampaignController.updateCampaign
+);
+
+router.post(
+    "/upload-campaign-photo",
+    fileUpload({ createParentPath: false }),
+    authMiddleware.validate,
+    CampaignController.uploadCampaignPhoto
 );
 
 export default router;

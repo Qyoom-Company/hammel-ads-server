@@ -5,6 +5,7 @@ import { UserType } from "../types/user/UserType";
 import crypto from "crypto";
 import { sendConfirmationEmail } from "../services/email";
 import { CampaignStatus } from "../types/campaign/CampaignStatus";
+import Campaign from "../types/campaign";
 
 const userSchema = new mongoose.Schema({
     title: {
@@ -67,7 +68,7 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-const Campaign = mongoose.model<IUser & mongoose.Document>(
+const Campaign = mongoose.model<Campaign & mongoose.Document>(
     "Campaign",
     userSchema
 );

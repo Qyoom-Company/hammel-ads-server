@@ -3,9 +3,13 @@ import { validationResult } from "express-validator";
 import { ValidationError, ValidationResult } from "../types/validation";
 import CampaignSchema from "../models/CampaignSchema";
 import { isValidObjectId } from "mongoose";
+import path from "path";
+import MediaController from "./mediaController";
+import { CampaignStatus } from "../types/campaign/CampaignStatus";
 class CampaignController {
     static addCampaign = async (req: Request, res: Response) => {
         try {
+            console.log(req);
             if (req.currentUser?.isEmailConfirmed === false) {
                 return res.status(401).json({
                     status: "error",
@@ -35,10 +39,15 @@ class CampaignController {
                     status,
                 } = req.body;
 
+                console.log(startDate, endDate);
+
+                let startDateFormatted = new Date(startDate).toISOString();
+                let endDateFormatted = new Date(endDate).toISOString();
+
                 const campaign = new CampaignSchema({
                     title,
-                    startDate,
-                    endDate,
+                    startDate: startDateFormatted,
+                    endDate: endDateFormatted,
                     budget,
                     country,
                     photoPath,
@@ -67,7 +76,9 @@ class CampaignController {
                 return res.status(200).json({
                     status: "success",
                     message: "campaigns fetched successfully",
-                    data: campaigns,
+                    data: campaigns.filter(
+                        (campaign) => campaign.status !== CampaignStatus.DRAFT
+                    ),
                 });
             } else {
                 const campaigns = await CampaignSchema.find({
@@ -225,6 +236,41 @@ class CampaignController {
             });
         } catch (err) {
             return res.status(500).json({
+                status: "error",
+                message: "internal server error",
+            });
+        }
+    };
+
+    static uploadCampaignPhoto = async (req: Request, res: Response) => {
+        try {
+            // @ts-ignore
+            const file = req.files?.campaignPhoto;
+            console.log(req.files);
+            if (!file) {
+                return res
+                    .status(400)
+                    .json({ status: "error", message: "no file selected!" });
+            }
+            const extention = path.parse(file.name).ext;
+            if (!file.mimetype.startsWith("image")) {
+                res.status(400).json({
+                    status: "error",
+                    message: "invalid file type",
+                });
+            }
+            const filename = await MediaController.saveFile(file);
+            res.status(200).json({
+                status: "success",
+                message: "photo uploaded",
+                data: {
+                    photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
+                },
+            });
+        } catch (err: any) {
+            console.log(err);
+
+            res.status(500).json({
                 status: "error",
                 message: "internal server error",
             });

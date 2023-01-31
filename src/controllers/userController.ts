@@ -4,6 +4,7 @@ import { ValidationError, ValidationResult } from "../types/validation";
 import crypto from "crypto";
 import path from "path";
 import User from "../models/UserSchema";
+import MediaController from "./mediaController";
 class UserController {
     static getUserInfo = async (req: Request, res: Response) => {
         try {
@@ -114,16 +115,16 @@ class UserController {
             }
             const extention = path.parse(file.name).ext;
             if (!file.mimetype.startsWith("image")) {
-                res.status(400).json({
+                return res.status(400).json({
                     status: "error",
                     message: "invalid file type",
                 });
             }
-            const filename = await this.saveFile(file);
+            const filename = await MediaController.saveFile(file);
             await User.findByIdAndUpdate(req.currentUser?._id, {
                 photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
             });
-            res.status(200).json({
+            return res.status(200).json({
                 status: "success",
                 message: "photo uploaded",
                 data: {
@@ -133,7 +134,7 @@ class UserController {
         } catch (err: any) {
             console.log(err);
 
-            res.status(500).json({
+            return res.status(500).json({
                 status: "error",
                 message: "internal server error",
             });
@@ -158,27 +159,6 @@ class UserController {
             });
         }
     };
-
-    private static saveFile(file: any) {
-        return new Promise((resolve, reject) => {
-            const filename = this.generateRandomName(20);
-            const extention = path.parse(file.name).ext;
-            file.mv(
-                `${__dirname}/../../uploads/${filename}${extention}`,
-                (err: any) => {
-                    if (err) reject(err);
-                    else resolve(filename);
-                }
-            );
-        });
-    }
-
-    private static generateRandomName(length: number) {
-        return crypto
-            .randomBytes(Math.ceil(length / 2))
-            .toString("hex")
-            .slice(0, length);
-    }
 }
 
 export default UserController;
