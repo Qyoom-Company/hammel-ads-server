@@ -9,8 +9,6 @@ import { CampaignStatus } from "../types/campaign/CampaignStatus";
 import countryList from "../static/countryList";
 const router = express.Router();
 
-// // const upload = multer({ dest: "uploads/" });
-
 router.post(
     "/",
     (req, res, next) => {
@@ -35,8 +33,8 @@ router.get("/:id", authMiddleware.validate, CampaignController.getOneCampaign);
 router.patch(
     "/:id",
     body("title").isLength({ min: 3, max: 30 }),
-    body("startDate").isDate({ format: "DD/MM/YYYY" }),
-    body("endDate").isDate({ format: "DD/MM/YYYY" }),
+    body("startDate").isDate({ format: "MM/DD/YYYY" }),
+    body("endDate").isDate({ format: "MM/DD/YYYY" }),
     body("budget").isNumeric(),
     body("country").notEmpty(),
     body("photoPath").notEmpty(),

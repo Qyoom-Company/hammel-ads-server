@@ -76,9 +76,7 @@ class CampaignController {
                 return res.status(200).json({
                     status: "success",
                     message: "campaigns fetched successfully",
-                    data: campaigns.filter(
-                        (campaign) => campaign.status !== CampaignStatus.DRAFT
-                    ),
+                    data: campaigns,
                 });
             } else {
                 const campaigns = await CampaignSchema.find({
@@ -185,6 +183,11 @@ class CampaignController {
                 status,
             } = req.body;
 
+            console.log(startDate);
+
+            let startDateFormatted = new Date(startDate).toISOString();
+            let endDateFormatted = new Date(endDate).toISOString();
+
             if (
                 campaign.userId !== String(req?.currentUser?._id) &&
                 req?.currentUser?.isAdmin !== true
@@ -199,8 +202,8 @@ class CampaignController {
             if (req?.currentUser?.isAdmin) {
                 await campaign.update({
                     title,
-                    startDate,
-                    endDate,
+                    startDateFormatted,
+                    endDateFormatted,
                     budget,
                     country,
                     photoPath,
@@ -210,8 +213,8 @@ class CampaignController {
             } else {
                 await campaign.update({
                     title,
-                    startDate,
-                    endDate,
+                    startDateFormatted,
+                    endDateFormatted,
                     budget,
                     country,
                     photoPath,
@@ -235,6 +238,7 @@ class CampaignController {
                 },
             });
         } catch (err) {
+            console.log(err);
             return res.status(500).json({
                 status: "error",
                 message: "internal server error",
