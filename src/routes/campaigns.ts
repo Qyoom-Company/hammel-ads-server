@@ -11,11 +11,6 @@ const router = express.Router();
 
 router.post(
     "/",
-    (req, res, next) => {
-        console.log("helloooooooo", req);
-        console.error("boooooooodyyy", req.body);
-        next();
-    },
     authMiddleware.validate,
     body("title").isLength({ min: 3, max: 30 }),
     body("startDate").isDate({ format: "MM/DD/YYYY" }),
