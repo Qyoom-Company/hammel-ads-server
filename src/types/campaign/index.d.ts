@@ -19,4 +19,5 @@ export default interface Campaign {
     clickRate: Number;
     views: Number;
     moneySpent: Number;
+    adminMessage: String;
 }

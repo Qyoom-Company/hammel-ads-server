@@ -5,6 +5,7 @@ import crypto from "crypto";
 import path from "path";
 import User from "../models/UserSchema";
 import MediaController from "./mediaController";
+import { isValidObjectId } from "mongoose";
 class UserController {
     static getUserInfo = async (req: Request, res: Response) => {
         try {
@@ -32,6 +33,56 @@ class UserController {
             }
         } catch (err) {
             console.log(err);
+        }
+    };
+    static getOneUser = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            if (!isValidObjectId(id)) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "invalid user id",
+                    data: null,
+                });
+            }
+
+            const user = await User.findById(id);
+            console.log(user);
+            if (!user) {
+                return res.status(404).json({
+                    status: "error",
+                    message: "user not found",
+                    data: null,
+                });
+            }
+            if (
+                user._id !== String(req?.currentUser?._id) &&
+                req?.currentUser?.isAdmin !== true
+            ) {
+                return res.status(401).json({
+                    status: "error",
+                    message: "unauthorized access",
+                    data: null,
+                });
+            }
+
+            return res.status(200).json({
+                status: "success",
+                message: "user fetched successfully",
+                data: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    phoneNumber: user.phoneNumber,
+                    photoPath: user.photoPath,
+                    isEmailConfirmed: user.isEmailConfirmed,
+                },
+            });
+        } catch (err) {
+            return res.status(500).json({
+                status: "error",
+                message: "internal server error",
+            });
         }
     };
     static updateUser = async (req: Request, res: Response) => {

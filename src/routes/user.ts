@@ -9,6 +9,7 @@ const router = express.Router();
 // const upload = multer({ dest: "uploads/" });
 
 router.get("/getuser", authMiddleware.validate, userController.getUserInfo);
+router.get("/:id", authMiddleware.validate, userController.getOneUser);
 router.patch(
     "/updateuser",
     authMiddleware.validate,

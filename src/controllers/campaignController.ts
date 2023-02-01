@@ -181,6 +181,7 @@ class CampaignController {
                 photoPath,
                 link,
                 status,
+                message,
             } = req.body;
 
             console.log(startDate);
@@ -209,6 +210,7 @@ class CampaignController {
                     photoPath,
                     link,
                     status,
+                    adminMessage: message,
                 });
             } else {
                 await campaign.update({
@@ -220,6 +222,7 @@ class CampaignController {
                     photoPath,
                     link,
                     status,
+                    adminMessage: "",
                 });
             }
 

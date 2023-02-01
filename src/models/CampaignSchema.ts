@@ -66,6 +66,10 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    adminMessage: {
+        type: String,
+        default: null,
+    },
 });
 
 const Campaign = mongoose.model<Campaign & mongoose.Document>(
