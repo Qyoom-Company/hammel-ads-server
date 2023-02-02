@@ -98,6 +98,24 @@ The API may return the following error codes:
 
 ## tech stack used:
 
-NodeJS+Express
-TypeScript
-Mongodb + Mongoose
+### main
+
+NodeJS+Express : backend logic
+Mongodb + Mongoose : database
+
+### tools
+
+TypeScript : type safety
+bcrypt, crypto: for all encryption related operations
+body-parser: for formatting and parsing parameters
+cors, helmet: for security
+jsonwebtoken libary: for generating and managing jwt tokens
+path: for managing file names and extensions
+ts-node: for running the node app
+express-rate-limit: for limiting the number of requests for a user in a time frame specified
+express-validator: for validation forms
+express-fileupload: for uploading files to the server
+dotenv: for configuring the environment variables
+nodemailer: for sending emails
+@types/\*: for configuring the typescript types for any module
+ts-node-dev: for rebuilding the node app on save on development mode
