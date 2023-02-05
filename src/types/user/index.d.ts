@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { UserType } from "./UserType";
-export default interface IUser {
+export default interface IUser extends mongoose.Document {
     _id: string;
     firstName: string;
     lastName: string;
@@ -15,9 +15,7 @@ export default interface IUser {
     userType: UserType;
     userId: string;
     createdAt: Date;
-    clicks: number;
-    clickRate: number | null;
-    views: number;
+    balance: number;
 
     generateAuthToken: () => string;
     generateConfirmationToken: () => string;

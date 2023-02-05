@@ -27,6 +27,7 @@ class UserController {
                             phoneNumber: req.currentUser?.phoneNumber,
                             photoPath: req.currentUser?.photoPath,
                             isAdmin: req.currentUser?.isAdmin,
+                            balance: req.currentUser?.balance,
                         },
                     },
                 });
@@ -205,6 +206,49 @@ class UserController {
         } catch (err: any) {
             console.log(err);
 
+            res.status(500).json({
+                status: "error",
+                message: "internal server error",
+            });
+        }
+    };
+    static adminIncreaseUserBalance = async (req: Request, res: Response) => {
+        try {
+            const validationResults = validationResult(
+                req
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
+                });
+            }
+
+            if (!req?.currentUser?.isAdmin) {
+                return res.status(401).json({
+                    status: "error",
+                    message: "unauthorized access",
+                });
+            }
+            const amount = Number(req.body.amount);
+            const userEmail = req.body.userEmail;
+
+            const user = await User.findOne({ email: userEmail });
+            if (!user) {
+                return res.status(404).json({
+                    status: "error",
+                    message: "user not found",
+                });
+            }
+            user.balance = user.balance + amount;
+            await user.save();
+            res.status(200).json({
+                status: "success",
+                message: "user balance increased",
+            });
+        } catch (err) {
             res.status(500).json({
                 status: "error",
                 message: "internal server error",

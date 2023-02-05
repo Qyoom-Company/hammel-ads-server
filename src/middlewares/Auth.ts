@@ -44,6 +44,7 @@ class Auth {
                 password: user.password,
                 photoPath: user.photoPath,
                 isAdmin: user.userType === UserType.Admin,
+                balance: user.balance,
             };
 
             next();

@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+    balance: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const generateConfirmationToken = () => {
@@ -55,6 +59,6 @@ userSchema.pre("save", function (next) {
     next();
 });
 
-const User = mongoose.model<IUser & mongoose.Document>("User", userSchema);
+const User = mongoose.model<IUser>("User", userSchema);
 
 export default User;

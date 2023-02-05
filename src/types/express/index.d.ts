@@ -10,6 +10,7 @@ declare namespace Express {
             password: string;
             photoPath: string | null;
             isAdmin: Boolean;
+            balance: number;
         };
     }
 }

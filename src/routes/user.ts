@@ -34,4 +34,12 @@ router.delete(
     userController.removeProfilePhoto
 );
 
+router.put(
+    "/increase-balance",
+    authMiddleware.validate,
+    body("userEmail").isEmail(),
+    body("amount").isNumeric(),
+    userController.adminIncreaseUserBalance
+);
+
 export default router;
