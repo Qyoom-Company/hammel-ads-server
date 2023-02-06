@@ -181,7 +181,7 @@ class CampaignController {
                 photoPath,
                 link,
                 status,
-                message,
+                adminMessage,
             } = req.body;
 
             console.log(startDate);
@@ -201,6 +201,7 @@ class CampaignController {
             }
 
             if (req?.currentUser?.isAdmin) {
+                console.log("admin mmmm", adminMessage);
                 await campaign.update({
                     title,
                     startDateFormatted,
@@ -210,7 +211,7 @@ class CampaignController {
                     photoPath,
                     link,
                     status,
-                    adminMessage: message,
+                    adminMessage: adminMessage,
                 });
             } else {
                 await campaign.update({
@@ -253,7 +254,6 @@ class CampaignController {
         try {
             // @ts-ignore
             const file = req.files?.campaignPhoto;
-            console.log(req.files);
             if (!file) {
                 return res
                     .status(400)
