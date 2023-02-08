@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import UserPaymentMethodType from "../payment method";
 import { UserType } from "./UserType";
 export default interface IUser extends mongoose.Document {
     _id: string;
@@ -16,6 +17,7 @@ export default interface IUser extends mongoose.Document {
     userId: string;
     createdAt: Date;
     balance: number;
+    paymentMethods: UserPaymentMethodType[];
 
     generateAuthToken: () => string;
     generateConfirmationToken: () => string;

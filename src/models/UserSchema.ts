@@ -4,6 +4,7 @@ import IUser from "../types/user/";
 import { UserType } from "../types/user/UserType";
 import crypto from "crypto";
 import { sendConfirmationEmail } from "../services/email";
+import UserPaymentMethodType from "../types/payment method";
 
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
@@ -36,6 +37,10 @@ const userSchema = new mongoose.Schema({
     balance: {
         type: Number,
         default: 0,
+    },
+    paymentMethods: {
+        type: Array<UserPaymentMethodType>,
+        default: [],
     },
 });
 

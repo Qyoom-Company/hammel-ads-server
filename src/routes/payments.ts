@@ -6,11 +6,24 @@ import { body } from "express-validator";
 const router = express.Router();
 
 router.post(
-    "/directpayment",
+    "/newdirectpayment",
     authMiddleware.validate,
     body("amount").isNumeric(),
     body("cardDetails").notEmpty(),
-    PaymentsController.executeDirectPayment
+    PaymentsController.executeNewDirectPayment
+);
+router.post(
+    "/directpayment",
+    authMiddleware.validate,
+    body("amount").isNumeric(),
+    body("token").notEmpty(),
+    PaymentsController.executeNewDirectPayment
+);
+
+router.get(
+    "/paymentmethods",
+    authMiddleware.validate,
+    PaymentsController.getAllPaymentMethods
 );
 
 router.post(

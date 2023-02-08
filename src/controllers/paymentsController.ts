@@ -1,11 +1,21 @@
 import axios, { Axios } from "axios";
 import { ValidationError, validationResult } from "express-validator";
 import { Request, Response } from "express";
-import { request } from "https";
 import User from "../models/UserSchema";
 import { ValidationResult } from "../types/validation";
 class PaymentsController {
-    static executeDirectPayment = async (req: any, res: any) => {
+    static getAllPaymentMethods = async (req: any, res: any) => {
+        const user = await User.findById(req?.currentUser?._id);
+        if (!user)
+            return res
+                .status(500)
+                .json({ status: "error", message: "internal server error" });
+        return res
+            .status(200)
+            .json({ status: "success", data: user.paymentMethods });
+    };
+
+    static executeNewDirectPayment = async (req: any, res: any) => {
         try {
             const validationResults = validationResult(
                 req
@@ -32,6 +42,29 @@ class PaymentsController {
                     message: "invalid card details",
                 });
             }
+            const user = await User.findById(req?.currentUser?._id);
+            if (!user)
+                return res.status(500).json({
+                    status: "error",
+                    message: "internal server error",
+                });
+
+            if (
+                user.paymentMethods.filter(
+                    (paymentMethod) =>
+                        paymentMethod.cardInfo.number.substring(
+                            paymentMethod.cardInfo.number.length - 4
+                        ) ===
+                        cardDetails.Number.substring(
+                            cardDetails.Number.length - 4
+                        )
+                ).length !== 0
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "payment method already exists",
+                });
+            }
 
             const directPaymentLink: any = await this.getDirectPaymentLink(
                 amount
@@ -40,17 +73,24 @@ class PaymentsController {
                 directPaymentLink,
                 cardDetails
             );
-
-            if (response.data.IsSuccess) {
-                const user = await User.findById(req?.currentUser?._id);
-                if (!user)
-                    return res
-                        .status(500)
-                        .json({
-                            status: "error",
-                            message: "internal server error",
-                        });
+            if (response?.data?.IsSuccess) {
                 user.balance = user.balance + Number(amount);
+
+                user.paymentMethods = [
+                    ...user.paymentMethods,
+                    {
+                        token: response.data.Data.Token,
+                        cardInfo: {
+                            number: response.data.Data.CardInfo.Number,
+                            expiryMonth:
+                                response.data.Data.CardInfo.ExpiryMonth,
+                            expiryYear: response.data.Data.CardInfo.ExpiryYear,
+                            brand: response.data.Data.CardInfo.Brand,
+                            issuer: response.data.Data.CardInfo.Issuer,
+                        },
+                    },
+                ];
+
                 await user.save();
                 return res.status(200).json({
                     isSuccess: true,
@@ -58,14 +98,16 @@ class PaymentsController {
                     message: "payment successful",
                 });
             }
+            console.log(response);
 
-            return res.status(400).status({
+            return res.status(400).json({
                 isSuccess: false,
                 status: "error",
                 message: "payment failed",
             });
         } catch (err) {
-            return res.status(500).status({
+            console.log(err);
+            return res.status(500).json({
                 isSuccess: false,
                 status: "error",
                 message: "internal server error",
@@ -164,7 +206,7 @@ class PaymentsController {
                     }
                 )
                 .then((res) => resolve(res))
-                .catch((err) => reject(err));
+                .catch((err) => resolve(err));
         });
     };
 }
