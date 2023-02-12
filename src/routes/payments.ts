@@ -17,13 +17,20 @@ router.post(
     authMiddleware.validate,
     body("amount").isNumeric(),
     body("token").notEmpty(),
-    PaymentsController.executeNewDirectPayment
+    PaymentsController.executeDirectPaymentUsingToken
 );
 
 router.get(
     "/paymentmethods",
     authMiddleware.validate,
     PaymentsController.getAllPaymentMethods
+);
+
+router.delete(
+    "/paymentmethods",
+    authMiddleware.validate,
+    body("token").notEmpty(),
+    PaymentsController.removeOnePaymentMethod
 );
 
 router.post(

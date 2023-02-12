@@ -3,6 +3,7 @@ import { ValidationError, validationResult } from "express-validator";
 import { Request, Response } from "express";
 import User from "../models/UserSchema";
 import { ValidationResult } from "../types/validation";
+import UserPaymentMethodType from "../types/payment method";
 class PaymentsController {
     static getAllPaymentMethods = async (req: any, res: any) => {
         const user = await User.findById(req?.currentUser?._id);
@@ -13,6 +14,117 @@ class PaymentsController {
         return res
             .status(200)
             .json({ status: "success", data: user.paymentMethods });
+    };
+
+    static removeOnePaymentMethod = async (req: any, res: any) => {
+        try {
+            const validationResults = validationResult(
+                req
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
+                });
+            }
+
+            const { token } = req.body;
+
+            const user = await User.findById(req?.currentUser?._id);
+            if (!user)
+                return res.status(500).json({
+                    status: "error",
+                    message: "internal server error",
+                });
+
+            const filteredPaymentMethods = user.paymentMethods.filter(
+                (paymentMethod: UserPaymentMethodType) =>
+                    paymentMethod.token !== token
+            );
+            if (filteredPaymentMethods.length === user.paymentMethods.length) {
+                return res
+                    .status(400)
+                    .json({ status: "error", message: "invalid token" });
+            }
+            user.paymentMethods = filteredPaymentMethods;
+
+            await user.save();
+
+            res.status(200).json({
+                status: "success",
+                message: "payment method removed successfully",
+            });
+        } catch (err) {
+            return res
+                .status(500)
+                .json({ status: "error", message: "internal server error" });
+        }
+    };
+
+    static executeDirectPaymentUsingToken = async (req: any, res: any) => {
+        try {
+            // add check for token
+            const validationResults = validationResult(
+                req
+            ) as unknown as ValidationResult;
+            const errors: ValidationError[] =
+                (validationResults?.errors as ValidationError[]) || [];
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    status: "error",
+                    message: `invalid ${errors[0]?.param} : ${errors[0]?.value}`,
+                });
+            }
+
+            const { amount, token } = req.body;
+
+            const user = await User.findById(req?.currentUser?._id);
+            if (
+                !user ||
+                !(
+                    user.paymentMethods.filter(
+                        (paymentMethod) => paymentMethod.token === token
+                    ).length > 0
+                )
+            ) {
+                return res.status(404).json({
+                    status: "error",
+                    message: "invalid token used for transaction",
+                });
+            }
+
+            const directPaymentLink: any = await this.getDirectPaymentLink(
+                amount
+            );
+            const response: any = await this.directPaymentUsingToken(
+                directPaymentLink,
+                token
+            );
+
+            if (response?.data?.IsSuccess) {
+                user.balance = user.balance + Number(amount);
+                await user.save();
+                return res.status(200).json({
+                    isSuccess: true,
+                    status: "success",
+                    message: "payment successful",
+                });
+            }
+            console.log("errrrrorrrrr", response);
+            return res.status(400).json({
+                isSuccess: false,
+                status: "error",
+                message: "payment failed",
+            });
+        } catch (err) {
+            return res.status(500).json({
+                isSuccess: false,
+                status: "error",
+                message: "internal server error",
+            });
+        }
     };
 
     static executeNewDirectPayment = async (req: any, res: any) => {
@@ -69,7 +181,7 @@ class PaymentsController {
             const directPaymentLink: any = await this.getDirectPaymentLink(
                 amount
             );
-            const response: any = await this.directPayment(
+            const response: any = await this.directPaymentUsingCard(
                 directPaymentLink,
                 cardDetails
             );
@@ -183,7 +295,7 @@ class PaymentsController {
                 .catch((err) => reject(err));
         });
     };
-    private static directPayment = async (
+    private static directPaymentUsingCard = async (
         directPaymentLink: string,
         cardObject: any
     ) => {
@@ -196,6 +308,31 @@ class PaymentsController {
                         SaveToken: true,
                         Card: cardObject,
                         //   "Token": "string",
+                        Bypass3DS: true,
+                    },
+                    {
+                        headers: {
+                            Authorization:
+                                "Bearer " + process.env.MYFATOORAH_DEMO_API_KEY,
+                        },
+                    }
+                )
+                .then((res) => resolve(res))
+                .catch((err) => resolve(err));
+        });
+    };
+
+    private static directPaymentUsingToken = async (
+        directPaymentLink: string,
+        token: string
+    ) => {
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    directPaymentLink,
+                    {
+                        PaymentType: "token",
+                        Token: token,
                         Bypass3DS: true,
                     },
                     {
