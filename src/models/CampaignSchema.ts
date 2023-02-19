@@ -1,13 +1,9 @@
 import * as mongoose from "mongoose";
-import jwt, { Secret } from "jsonwebtoken";
-import IUser from "../types/user/";
-import { UserType } from "../types/user/UserType";
-import crypto from "crypto";
-import { sendConfirmationEmail } from "../services/email";
 import { CampaignStatus } from "../types/campaign/CampaignStatus";
 import Campaign from "../types/campaign";
+import Event from "../types/event/";
 
-const userSchema = new mongoose.Schema({
+const campaignSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -70,11 +66,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    events: {
+        type: Array<Event>,
+        default: [],
+    },
 });
 
 const Campaign = mongoose.model<Campaign & mongoose.Document>(
     "Campaign",
-    userSchema
+    campaignSchema
 );
 
 export default Campaign;

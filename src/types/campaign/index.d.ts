@@ -1,23 +1,21 @@
 import mongoose from "mongoose";
 import { CampaignStatus } from "./CampaignStatus";
+import Event from "../event";
 export default interface Campaign {
-    title: String;
+    title: string;
     startDate: Date;
     endDate: Date;
-
-    budget: {
-        type: Number;
-        required: true;
-    };
-    country: String;
-    photoPath: String;
-    link: String;
+    budget: number;
+    country: string;
+    photoPath: string;
+    link: string;
     status: CampaignStatus;
-    userId: String;
+    userId: string;
     createdAt: Date;
-    clicks: Number;
-    clickRate: Number;
-    views: Number;
-    moneySpent: Number;
-    adminMessage: String;
+    clicks: number;
+    clickRate: number;
+    views: number;
+    moneySpent: number;
+    adminMessage: string;
+    events: Array<Event>;
 }

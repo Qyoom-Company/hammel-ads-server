@@ -172,7 +172,7 @@ class CampaignController {
                 });
             }
 
-            const {
+            let {
                 title,
                 startDate,
                 endDate,
@@ -201,7 +201,6 @@ class CampaignController {
             }
 
             if (req?.currentUser?.isAdmin) {
-                console.log("admin mmmm", adminMessage);
                 await campaign.update({
                     title,
                     startDateFormatted,
@@ -214,6 +213,15 @@ class CampaignController {
                     adminMessage: adminMessage,
                 });
             } else {
+                if (
+                    campaign.photoPath !== photoPath ||
+                    campaign.link !== link
+                ) {
+                    status = CampaignStatus.INREVIEW;
+                } else {
+                    status = campaign.status;
+                }
+                console.log(status);
                 await campaign.update({
                     title,
                     startDateFormatted,
