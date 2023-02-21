@@ -9,13 +9,13 @@ const router = express.Router();
 router.get(
     "/user-stats",
     AuthMiddleware.validate,
-    AnalyiticsController.getAllUserEvents
+    AnalyiticsController.getAllUserStats
 );
 
 router.get(
     "/campaign-stats",
     AuthMiddleware.validate,
-    AnalyiticsController.getSingleCampaignEvents
+    AnalyiticsController.getSingleCampaignStats
 );
 
 /*

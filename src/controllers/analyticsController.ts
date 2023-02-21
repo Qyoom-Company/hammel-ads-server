@@ -19,7 +19,7 @@ class AnalyiticsController {
         }
     };
 
-    static getAllUserEvents = async (req: Request, res: Response) => {
+    static getAllUserStats = async (req: Request, res: Response) => {
         try {
             const { from, to } = req.body;
             if (from) {
@@ -74,7 +74,7 @@ class AnalyiticsController {
         }
     };
 
-    static getSingleCampaignEvents = async (req: Request, res: Response) => {
+    static getSingleCampaignStats = async (req: Request, res: Response) => {
         try {
             const { campaignId, from, to } = req.body;
 
