@@ -13,7 +13,19 @@ router.get(
 );
 
 router.get(
+    "/user-analytics",
+    AuthMiddleware.validate,
+    AnalyiticsController.getUserAnalyitics
+);
+
+router.get(
     "/campaign-stats",
+    AuthMiddleware.validate,
+    AnalyiticsController.getSingleCampaignStats
+);
+
+router.get(
+    "/c",
     AuthMiddleware.validate,
     AnalyiticsController.getSingleCampaignStats
 );
