@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
 import campaignRoutes from "./routes/campaigns";
 import paymentRoutes from "./routes/payments";
+import analyiticsRoutes from "./routes/analytics";
 import rateLimit, { MemoryStore } from "express-rate-limit";
 import helmet from "helmet";
 require("dotenv").config();
@@ -40,6 +41,8 @@ app.use("/api/auth", limiter, authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/campaigns", campaignRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/analytics", analyiticsRoutes);
+
 app.use("/uploads", express.static("uploads"));
 
 // port
