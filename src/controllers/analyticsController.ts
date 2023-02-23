@@ -16,6 +16,8 @@ class AnalyiticsController {
         try {
             const { type, from, to } = req.body;
 
+            console.log(type);
+
             // validate parameters
 
             if (!type || ![EventType.CLICK, EventType.VIEW].includes(type)) {
@@ -61,7 +63,11 @@ class AnalyiticsController {
                     const toDate = new Date(to);
                     toDate.setDate(toDate.getDate() + 2);
 
-                    return createdAt >= fromDate && createdAt <= toDate;
+                    return (
+                        createdAt >= fromDate &&
+                        createdAt <= toDate &&
+                        event.type === type
+                    );
                 });
 
             // group events by date
@@ -89,8 +95,12 @@ class AnalyiticsController {
             });
 
             return res.json({
-                labels,
-                data,
+                status: "success",
+                message: "analyitics fetched successfully",
+                data: {
+                    labels,
+                    datasets: data,
+                },
             });
         } catch (err) {
             console.log(err);
@@ -174,6 +184,24 @@ class AnalyiticsController {
                     status: "error",
                     message: "invalid campaignId",
                 });
+            const campaign = await Campaign.findById(campaignId);
+
+            if (!campaign) {
+                return res.status(404).json({
+                    status: "error",
+                    message: "campaign not found",
+                });
+            }
+
+            if (
+                campaign.userId != req?.currentUser?._id &&
+                !req?.currentUser?.isAdmin
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "unauthorized",
+                });
+            }
 
             const clicks = await this.getOneCampaignEventsByDateRange(
                 EventType.CLICK,
@@ -208,6 +236,121 @@ class AnalyiticsController {
         }
     };
 
+    static getCampaignAnalyitics = async (req: Request, res: Response) => {
+        try {
+            const { type, from, to, campaignId } = req.body;
+
+            if (!campaignId)
+                return res.status(400).json({
+                    status: "error",
+                    message: "campaignId not specified",
+                });
+
+            if (!isValidObjectId(campaignId))
+                return res.status(400).json({
+                    status: "error",
+                    message: "invalid campaignId",
+                });
+
+            // validate parameters
+
+            if (!type || ![EventType.CLICK, EventType.VIEW].includes(type)) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "invalid event type",
+                });
+            }
+            if (
+                !from ||
+                !to ||
+                !moment(from).isValid() ||
+                !moment(to).isValid()
+            ) {
+                return res
+                    .status(400)
+                    .json({ status: "error", message: "invalid date" });
+            }
+
+            const fromMoment = moment(from, "MM-DD-YYYY");
+            const toMoment = moment(to, "MM-DD-YYYY");
+
+            const labels: string[] = [];
+
+            for (
+                let date = fromMoment;
+                date <= toMoment;
+                date = date.clone().add(1, "d")
+            ) {
+                labels.push(date.format("YYYY-MM-DD"));
+            }
+
+            //get all events from user that are between from and to
+
+            let campaign = await Campaign.findById(campaignId).populate(
+                "events"
+            );
+            if (!campaign)
+                return res.status(404).json({
+                    status: "error",
+                    message: "campaign not found",
+                });
+
+            if (
+                campaign.userId != req?.currentUser?._id &&
+                !req?.currentUser?.isAdmin
+            ) {
+                return res.status(400).json({
+                    status: "error",
+                    message: "unauthorized",
+                });
+            }
+
+            const events = campaign.events.filter((event) => {
+                const createdAt = new Date(event.createdAt);
+                const fromDate = new Date(from);
+                const toDate = new Date(to);
+                toDate.setDate(toDate.getDate() + 2);
+
+                return (
+                    createdAt >= fromDate &&
+                    createdAt <= toDate &&
+                    event.type === type
+                );
+            });
+
+            // group events by date
+
+            const eventsByDate: { [key: string]: number } = {};
+
+            events.forEach((event) => {
+                const date = event.createdAt.toISOString().slice(0, 10);
+
+                if (!eventsByDate[date]) {
+                    eventsByDate[date] = 0;
+                }
+                eventsByDate[date]++;
+            });
+
+            // create data array with count of events for each date
+
+            const data: number[] = [];
+            labels.forEach((label) => {
+                if (eventsByDate[label]) {
+                    data.push(eventsByDate[label]);
+                } else {
+                    data.push(0);
+                }
+            });
+
+            return res.json({
+                labels,
+                datasets: data,
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     private static getAllCampaignsEventsByDateRange = async (
         eventType: string,
         currentUserId: string,
@@ -219,6 +362,7 @@ class AnalyiticsController {
                 ? new Date(fromDateString)
                 : undefined;
             const toDate = toDateString ? new Date(toDateString) : undefined;
+            if (toDate) toDate.setDate(toDate.getDate() + 2);
 
             const campaigns = await Campaign.find({
                 userId: currentUserId,
@@ -259,6 +403,7 @@ class AnalyiticsController {
                 ? new Date(fromDateString)
                 : undefined;
             const toDate = toDateString ? new Date(toDateString) : undefined;
+            if (toDate) toDate.setDate(toDate.getDate() + 2);
 
             const campaign = await Campaign.findById(campaignId).populate(
                 "events"
