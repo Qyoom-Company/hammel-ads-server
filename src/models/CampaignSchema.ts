@@ -1,7 +1,8 @@
 import * as mongoose from "mongoose";
 import { CampaignStatus } from "../types/campaign/CampaignStatus";
 import Campaign from "../types/campaign";
-import Event from "../types/event/";
+import Event from "../types/event";
+import Load from "../types/load";
 
 const campaignSchema = new mongoose.Schema({
     title: {
@@ -68,6 +69,10 @@ const campaignSchema = new mongoose.Schema({
     },
     events: {
         type: Array<Event>,
+        default: [],
+    },
+    loads: {
+        type: Array<Load>,
         default: [],
     },
 });
