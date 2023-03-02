@@ -7,6 +7,46 @@ let transporter = nodemailer.createTransport({
     },
 });
 
+export async function sendReviewEmailToUser(message: string, email: string) {
+    try {
+        const mailOptions = {
+            from: "mellitifiras@protonmail.com",
+            to: email,
+            subject: "campaign review results",
+            text: `the admin has reviewed your campaign.
+            message: ${message}
+            `,
+        };
+
+        console.log("subject: ", mailOptions.subject);
+        console.log("text: ", mailOptions.text);
+
+        await transporter.sendMail(mailOptions);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+export async function sendEmailToAdmin(campaignId: string, email: string) {
+    try {
+        const mailOptions = {
+            from: "mellitifiras@protonmail.com",
+            to: email,
+            subject: "new campaign sent to review",
+            text: `there is a new campaign that has been sent to review.
+            link: http://localhost:3000/admin/dashboard/campaigns/${campaignId}\n
+            `,
+        };
+
+        console.log("subject: ", mailOptions.subject);
+        console.log("text: ", mailOptions.text);
+
+        await transporter.sendMail(mailOptions);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 export async function sendConfirmationEmail(token: string, email: string) {
     try {
         const mailOptions = {

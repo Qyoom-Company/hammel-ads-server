@@ -6,6 +6,8 @@ import { isValidObjectId } from "mongoose";
 import path from "path";
 import MediaController from "./mediaController";
 import { CampaignStatus } from "../types/campaign/CampaignStatus";
+import { sendEmailToAdmin, sendReviewEmailToUser } from "../services/email";
+import User from "../models/UserSchema";
 class CampaignController {
     static addCampaign = async (req: Request, res: Response) => {
         try {
@@ -57,6 +59,11 @@ class CampaignController {
                 });
 
                 campaign.save();
+
+                if (status === CampaignStatus.INREVIEW) {
+                    // send email to administration team
+                    sendEmailToAdmin(campaign._id, "admin@gmail.com");
+                }
 
                 return res.status(200).json({
                     status: "success",
@@ -212,12 +219,23 @@ class CampaignController {
                     status,
                     adminMessage: adminMessage,
                 });
+                if (adminMessage) {
+                    const user = await User.findById(campaign.userId);
+                    if (!user)
+                        return res.status(500).json({
+                            status: "error",
+                            message: "internal server error",
+                        });
+                    sendReviewEmailToUser(adminMessage, user.email);
+                }
             } else {
                 if (
                     campaign.photoPath !== photoPath ||
                     campaign.link !== link
                 ) {
                     status = CampaignStatus.INREVIEW;
+                    // send email to administration team
+                    sendEmailToAdmin(campaign._id, "admin@gmail.com");
                 } else {
                     status = campaign.status;
                 }
