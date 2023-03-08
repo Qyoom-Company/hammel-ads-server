@@ -1,25 +1,13 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import UserSchema from "../models/UserSchema";
-import { validationResult } from "express-validator";
-import { ValidationError, ValidationResult } from "../types/validation";
-import { sendPasswordResetEmail } from "../services/email";
-import crypto from "crypto";
-import User from "../models/UserSchema";
 import Campaign from "../models/CampaignSchema";
-import Event from "../types/event";
 import { isValidObjectId } from "mongoose";
 import { EventType } from "../types/event/EventType";
 import moment from "moment";
 class AnalyiticsController {
     static getUserAnalyitics = async (req: Request, res: Response) => {
         try {
-            const { type, from, to } = req.body;
-
-            console.log(type);
-
+            const { type, from, to, country, campaignName } = req.body;
             // validate parameters
-
             if (!type || ![EventType.CLICK, EventType.VIEW].includes(type)) {
                 return res.status(400).json({
                     status: "error",
@@ -50,11 +38,27 @@ class AnalyiticsController {
                 labels.push(date.format("YYYY-MM-DD"));
             }
 
-            //get all events from user that are between from and to
+            // get all events from user that are between from and to
 
-            const campaigns = await Campaign.find({
+            let campaigns = await Campaign.find({
                 userId: req?.currentUser?._id,
             }).populate("events");
+
+            if (country) {
+                campaigns = campaigns.filter(
+                    (campaign) =>
+                        campaign.country.toLowerCase() === country.toLowerCase()
+                );
+            }
+
+            if (campaignName) {
+                campaigns = campaigns.filter(
+                    (campaign) =>
+                        campaign.title.toLowerCase() ===
+                        campaignName.toLowerCase()
+                );
+            }
+
             let events = campaigns
                 .flatMap((campaign) => campaign.events)
                 .filter((event) => {
