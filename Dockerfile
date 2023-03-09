@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:latest
 
 WORKDIR /usr/src/app
 
@@ -10,6 +10,6 @@ COPY . .
 
 EXPOSE 8080
 
-# RUN chmod 777 /usr/local/bin/docker-entrypoint.sh
+
 
 CMD [ "npm", "start" ]
