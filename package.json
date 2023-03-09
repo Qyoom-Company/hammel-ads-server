@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "commonjs",
     "scripts": {
-        "start": "ts-node src/server.ts",
+        "start": "ts-node --transpile-only src/server.ts",
         "dev": "nodemon --exec ts-node-dev src/server.ts",
         "build": "tsc --outDir dist"
     },
