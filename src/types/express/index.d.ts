@@ -11,6 +11,7 @@ declare namespace Express {
             photoPath: string | null;
             isAdmin: Boolean;
             balance: number;
+            preferredLanguage: string;
         };
     }
 }

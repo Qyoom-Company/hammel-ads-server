@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     phoneNumber: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     photoPath: { type: String, default: null },
+    preferredLanguage: { type: String, default: "en" },
     userType: {
         type: String,
         default: UserType.User,

@@ -21,8 +21,14 @@ class AuthController {
                 });
             }
 
-            const { firstName, lastName, email, phoneNumber, password } =
-                req.body;
+            const {
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                password,
+                preferredLanguage,
+            } = req.body;
 
             const user = new UserSchema({
                 firstName,
@@ -30,6 +36,7 @@ class AuthController {
                 email,
                 phoneNumber,
                 password,
+                preferredLanguage,
             });
             user.password = await bcrypt.hash(password, 10);
             await user.save();

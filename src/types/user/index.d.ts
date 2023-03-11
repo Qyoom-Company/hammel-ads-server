@@ -9,6 +9,7 @@ export default interface IUser extends mongoose.Document {
     phoneNumber: string;
     password: string;
     photoPath: string | null;
+    preferredLanguage: string;
     isEmailConfirmed: Boolean;
     confirmationToken: string | null;
     resetToken: string | null;

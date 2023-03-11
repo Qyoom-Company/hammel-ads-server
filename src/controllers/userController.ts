@@ -28,6 +28,8 @@ class UserController {
                             photoPath: req.currentUser?.photoPath,
                             isAdmin: req.currentUser?.isAdmin,
                             balance: req.currentUser?.balance,
+                            preferredLanguage:
+                                req.currentUser?.preferredLanguage,
                         },
                     },
                 });
@@ -77,6 +79,7 @@ class UserController {
                     phoneNumber: user.phoneNumber,
                     photoPath: user.photoPath,
                     isEmailConfirmed: user.isEmailConfirmed,
+                    preferredLanguage: user.preferredLanguage,
                 },
             });
         } catch (err) {
@@ -136,6 +139,7 @@ class UserController {
                         lastName: userData.lastName,
                         email: userData.email,
                         phoneNumber: userData.phoneNumber,
+                        preferredLanguage: userData.preferredLanguage,
                     },
                 },
             });
