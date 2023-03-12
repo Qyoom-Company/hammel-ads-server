@@ -128,6 +128,7 @@ class UserController {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
                 phoneNumber: userData.phoneNumber,
+                preferredLanguage: userData.preferredLanguage,
             });
 
             res.status(200).json({
