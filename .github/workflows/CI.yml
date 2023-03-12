@@ -1,0 +1,60 @@
+name: CI
+
+# Must add secrets
+# - ACCESS_TOKEN
+# - DOCKER_USERNAME
+# - DOCKER_PASSWORD
+# - DOCKER_REGISTRY
+
+env:
+  DEPLOYMENT_MANIFEST_BRANCH: main
+  DEPLOYMENT_REPOSITORY: Qyoom-Company/hammel-ads-cicd
+  DEPLOYMENT_PATH: manifest/deployment.yaml
+  DEPLOYMENT_CONTAINER_INDEX: 0
+
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+  
+    - name: Check out code
+      uses: actions/checkout@v2
+        
+    - name: Build and push Docker image
+     # https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v1.1.0
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        registry: ${{ secrets.DOCKER_REGISTRY }}
+        repository: ${{ github.event.repository.name }}
+        tags: ${{ github.sha }}, latest
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    # https://github.com/actions/checkout
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        repository: '${{ env.DEPLOYMENT_REPOSITORY }}'
+        ref: '${{ env.DEPLOYMENT_MANIFEST_BRANCH }}'
+
+    - name: Update Image Version
+      id: imgupd
+      uses: mikefarah/yq@master
+      with:
+        cmd: yq eval '.spec.template.spec.containers[${{ env.DEPLOYMENT_CONTAINER_INDEX }}].image = "${{ secrets.DOCKER_REGISTRY }}/${{ github.event.repository.name }}:${{ github.sha }}"' -i ${{ env.DEPLOYMENT_PATH }}
+      
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply image name changes
