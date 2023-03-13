@@ -29,10 +29,15 @@ const limiter = rateLimit({
 // database connection
 connection();
 
+// // Enable CORS for https://gate.hammel.in
+const corsOptions = {
+    origin: "https://gate.hammel.in",
+};
+app.use(cors(corsOptions));
+
 // middlewares
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.disable("x-powered-by");
 
