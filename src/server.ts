@@ -29,24 +29,19 @@ const limiter = rateLimit({
 // database connection
 connection();
 
-// // Enable CORS for https://gate.hammel.in
-const corsOptions = {
-    origin: "https://gate.hammel.in",
-};
-app.use(cors(corsOptions));
-
 // middlewares
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(cors());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.disable("x-powered-by");
 
 // routes
-app.use("/api/auth", limiter, authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/campaigns", campaignRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/analytics", analyiticsRoutes);
+app.use("/auth", limiter, authRoutes);
+app.use("/users", userRoutes);
+app.use("/campaigns", campaignRoutes);
+app.use("/payments", paymentRoutes);
+app.use("/analytics", analyiticsRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
