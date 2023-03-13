@@ -37,11 +37,11 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.disable("x-powered-by");
 
 // routes
-app.use("/auth", limiter, authRoutes);
-app.use("/users", userRoutes);
-app.use("/campaigns", campaignRoutes);
-app.use("/payments", paymentRoutes);
-app.use("/analytics", analyiticsRoutes);
+app.use("/v1/auth", limiter, authRoutes);
+app.use("/v1/users", userRoutes);
+app.use("/v1/campaigns", campaignRoutes);
+app.use("/v1/payments", paymentRoutes);
+app.use("/v1/analytics", analyiticsRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
