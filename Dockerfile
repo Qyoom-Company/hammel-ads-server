@@ -11,5 +11,5 @@ COPY . .
 
 
 EXPOSE 3500
-USER node
+# USER node
 CMD "npm" "start"
