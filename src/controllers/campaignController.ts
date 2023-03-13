@@ -293,11 +293,16 @@ class CampaignController {
                 });
             }
             const filename = await MediaController.saveFile(file);
+
+            const domain =
+                process.env.ENV === "DEV"
+                    ? "https://api.gate.hammel.in"
+                    : "http://localhost:3500";
             res.status(200).json({
                 status: "success",
                 message: "photo uploaded",
                 data: {
-                    photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
+                    photoPath: `${domain}/uploads/${filename}${extention}`,
                 },
             });
         } catch (err: any) {
