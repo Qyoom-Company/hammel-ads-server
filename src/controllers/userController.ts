@@ -179,14 +179,18 @@ class UserController {
                 });
             }
             const filename = await MediaController.saveFile(file);
+            const domain =
+                process.env.ENV === "DEV"
+                    ? "http://localhost:3500"
+                    : "https://api.gate.hammel.in";
             await User.findByIdAndUpdate(req.currentUser?._id, {
-                photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
+                photoPath: `${domain}/uploads/${filename}${extention}`,
             });
             return res.status(200).json({
                 status: "success",
                 message: "photo uploaded",
                 data: {
-                    photoPath: `http://localhost:3500/uploads/${filename}${extention}`,
+                    photoPath: `${domain}/uploads/${filename}${extention}`,
                 },
             });
         } catch (err: any) {

@@ -296,8 +296,8 @@ class CampaignController {
 
             const domain =
                 process.env.ENV === "DEV"
-                    ? "https://api.gate.hammel.in"
-                    : "http://localhost:3500";
+                    ? "http://localhost:3500"
+                    : "https://api.gate.hammel.in";
             res.status(200).json({
                 status: "success",
                 message: "photo uploaded",
